@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { ACTIVE_EVENT } from "@/lib/constants";
 
 type Guardian = {
   id_wali: number;
@@ -16,29 +17,34 @@ export default function AbsentPage() {
 
   useEffect(() => {
     const load = async () => {
+      // 1️⃣ Ambil semua wali
       const { data: guardians } = await supabase
         .from("guardians")
-        .select("*")
+        .select("id_wali, nama_wali, nama_murid, kelas_murid")
         .order("id_wali");
 
+      // 2️⃣ Ambil wali yang HADIR di EVENT AKTIF
       const { data: present } = await supabase
         .from("attendances")
-        .select("guardian_id");
+        .select("guardian_id")
+        .eq("event_name", ACTIVE_EVENT);
 
       const presentIds = present?.map((p) => p.guardian_id) ?? [];
 
-      const absent = guardians?.filter((g) => !presentIds.includes(g.id_wali));
+      // 3️⃣ Filter: wali yang BELUM HADIR di event ini
+      const absent =
+        guardians?.filter((g) => !presentIds.includes(g.id_wali)) ?? [];
 
-      setRows(absent ?? []);
+      setRows(absent);
     };
 
     load();
   }, []);
 
   // ============================
-  // FILTER / SEARCH
+  // FILTER PENCARIAN
   // ============================
-  const filteredRows = rows.filter((g) => {
+  const filtered = rows.filter((g) => {
     const q = search.toLowerCase();
     return (
       g.id_wali.toString().includes(q) ||
@@ -51,18 +57,19 @@ export default function AbsentPage() {
   return (
     <div className="space-y-4">
       <h2 className="text-base font-semibold text-slate-100">
-        Daftar Wali Tidak Hadir
+        Wali Belum Hadir ({ACTIVE_EVENT})
       </h2>
 
-      {/* Search Bar */}
+      {/* SEARCH */}
       <input
         type="text"
-        placeholder="Cari berdasarkan nama wali / murid / ID / kelas..."
+        placeholder="Cari: wali, murid, kelas, ID..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500"
       />
 
+      {/* TABLE */}
       <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/60">
         <div className="max-h-[65vh] overflow-y-auto">
           <table className="min-w-full text-xs">
@@ -76,25 +83,27 @@ export default function AbsentPage() {
             </thead>
 
             <tbody>
-              {filteredRows.map((r) => (
+              {filtered.map((g) => (
                 <tr
-                  key={r.id_wali}
+                  key={g.id_wali}
                   className="border-t border-slate-800/70 hover:bg-slate-800/60"
                 >
-                  <td className="px-3 py-2 text-slate-300">{r.id_wali}</td>
-                  <td className="px-3 py-2 text-slate-100">{r.nama_wali}</td>
-                  <td className="px-3 py-2 text-slate-200">{r.nama_murid}</td>
-                  <td className="px-3 py-2 text-slate-300">{r.kelas_murid}</td>
+                  <td className="px-3 py-2 text-slate-300">{g.id_wali}</td>
+                  <td className="px-3 py-2 text-slate-100">{g.nama_wali}</td>
+                  <td className="px-3 py-2 text-slate-200">{g.nama_murid}</td>
+                  <td className="px-3 py-2 text-slate-300">
+                    {g.kelas_murid}
+                  </td>
                 </tr>
               ))}
 
-              {filteredRows.length === 0 && (
+              {filtered.length === 0 && (
                 <tr>
                   <td
                     colSpan={4}
                     className="px-3 py-4 text-center text-slate-400"
                   >
-                    Tidak ditemukan data...
+                    Semua wali sudah hadir 🎉
                   </td>
                 </tr>
               )}

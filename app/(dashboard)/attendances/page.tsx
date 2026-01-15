@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { ACTIVE_EVENT } from "@/lib/constants";
 
 type AttendanceRow = {
   id: number;
   guardian_id: number;
-  event_name: string | null;
+  event_name: string;
   scanned_at: string;
   guardians: {
     nama_wali: string;
@@ -25,17 +26,18 @@ export default function AttendancesPage() {
         .from("attendances")
         .select(
           `
-        id,
-        guardian_id,
-        event_name,
-        scanned_at,
-        guardians (
-          nama_wali,
-          nama_murid,
-          kelas_murid
+          id,
+          guardian_id,
+          event_name,
+          scanned_at,
+          guardians (
+            nama_wali,
+            nama_murid,
+            kelas_murid
+          )
+        `
         )
-      `
-        )
+        .eq("event_name", ACTIVE_EVENT) // 🔑 FILTER EVENT
         .order("scanned_at", { ascending: false });
 
       if (!error && data) {
@@ -54,7 +56,7 @@ export default function AttendancesPage() {
   }, []);
 
   // =============================
-  // FILTER PENCARIAN
+  // FILTER PENCARIAN (CLIENT)
   // =============================
   const filtered = rows.filter((r) => {
     const q = search.toLowerCase();
@@ -64,27 +66,31 @@ export default function AttendancesPage() {
       r.guardians?.nama_wali.toLowerCase().includes(q) ||
       r.guardians?.nama_murid.toLowerCase().includes(q) ||
       r.guardians?.kelas_murid.toLowerCase().includes(q) ||
-      (r.event_name ?? "").toLowerCase().includes(q) ||
-      new Date(r.scanned_at).toLocaleString("id-ID").toLowerCase().includes(q)
+      new Date(r.scanned_at)
+        .toLocaleString("id-ID")
+        .toLowerCase()
+        .includes(q)
     );
   });
 
   return (
     <div className="space-y-4">
-      <h2 className="text-base font-semibold text-slate-100">Log Kehadiran</h2>
+      <h2 className="text-base font-semibold text-slate-100">
+        Log Kehadiran ({ACTIVE_EVENT})
+      </h2>
 
-      {/* ===================== SEARCH BAR ===================== */}
+      {/* SEARCH BAR */}
       <div className="flex justify-end">
         <input
           type="text"
-          placeholder="Cari: wali, murid, kelas, event, ID..."
+          placeholder="Cari: wali, murid, kelas, ID, waktu..."
           className="w-full md:w-64 rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-emerald-500 transition"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 
-      {/* ===================== TABLE ===================== */}
+      {/* TABLE */}
       <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/80">
         <div className="max-h-[60vh] overflow-auto">
           <table className="min-w-full text-xs">
@@ -95,7 +101,6 @@ export default function AttendancesPage() {
                 <th className="px-3 py-2">Wali</th>
                 <th className="px-3 py-2">Murid</th>
                 <th className="px-3 py-2">Kelas</th>
-                <th className="px-3 py-2">Event</th>
               </tr>
             </thead>
 
@@ -108,7 +113,9 @@ export default function AttendancesPage() {
                   <td className="px-3 py-2 text-slate-300">
                     {new Date(r.scanned_at).toLocaleString("id-ID")}
                   </td>
-                  <td className="px-3 py-2 text-slate-300">{r.guardian_id}</td>
+                  <td className="px-3 py-2 text-slate-300">
+                    {r.guardian_id}
+                  </td>
                   <td className="px-3 py-2 text-slate-100">
                     {r.guardians?.nama_wali}
                   </td>
@@ -118,19 +125,16 @@ export default function AttendancesPage() {
                   <td className="px-3 py-2 text-slate-300">
                     {r.guardians?.kelas_murid}
                   </td>
-                  <td className="px-3 py-2 text-slate-400">
-                    {r.event_name ?? "-"}
-                  </td>
                 </tr>
               ))}
 
               {filtered.length === 0 && (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={5}
                     className="px-3 py-4 text-center text-slate-400"
                   >
-                    Tidak ditemukan hasil untuk pencarian ini.
+                    Belum ada data kehadiran untuk event ini.
                   </td>
                 </tr>
               )}
