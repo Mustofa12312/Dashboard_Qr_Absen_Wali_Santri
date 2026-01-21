@@ -8,6 +8,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.48.0",
     "chart.js": "^4.5.1",
     "clsx": "^2.1.0",

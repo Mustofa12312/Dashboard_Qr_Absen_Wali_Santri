@@ -57,7 +57,7 @@ export default function AbsentPage() {
   return (
     <div className="space-y-4">
       <h2 className="text-base font-semibold text-slate-100">
-        Wali Belum Hadir ({ACTIVE_EVENT})
+        Wali Para Wisuda yang belum hadir ({ACTIVE_EVENT})
       </h2>
 
       {/* SEARCH */}
