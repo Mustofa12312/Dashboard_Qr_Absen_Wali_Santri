@@ -23,6 +23,7 @@ export interface Database {
                     guardian_id: number
                     event_name: string
                     scanned_at?: string
+                    method?: string
                 }
                 Update: {
                     id?: number

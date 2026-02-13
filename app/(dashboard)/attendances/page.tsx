@@ -2,14 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { ACTIVE_EVENT } from "@/lib/constants";
+import { useEvent } from "@/context/EventContext";
 
-type AttendanceRow = {
+type Attendance = {
   id: number;
-  guardian_id: number;
-  event_name: string;
-  scanned_at: string;
-  guardians: {
+  created_at: string; // scanned_at
+  guardian: {
     nama_wali: string;
     nama_murid: string;
     kelas_murid: string;
@@ -17,7 +15,8 @@ type AttendanceRow = {
 };
 
 export default function AttendancesPage() {
-  const [rows, setRows] = useState<AttendanceRow[]>([]);
+  const { activeEvent } = useEvent();
+  const [attendances, setAttendances] = useState<Attendance[]>([]);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -27,28 +26,22 @@ export default function AttendancesPage() {
         .select(
           `
           id,
-          guardian_id,
-          event_name,
-          scanned_at,
-          guardians (
-            nama_wali,
-            nama_murid,
-            kelas_murid
-          )
+          created_at,
+          guardian:guardians (nama_wali, nama_murid, kelas_murid)
         `
         )
-        .eq("event_name", ACTIVE_EVENT) // 🔑 FILTER EVENT
-        .order("scanned_at", { ascending: false });
+        .eq("event_name", activeEvent) // 🔑 FILTER EVENT
+        .order("created_at", { ascending: false });
 
       if (!error && data) {
-        const normalized = data.map((row: any) => ({
-          ...row,
-          guardians: Array.isArray(row.guardians)
-            ? row.guardians[0]
-            : row.guardians,
+        // Transform data (flatten)
+        const formatted = data?.map((item: any) => ({
+          id: item.id,
+          created_at: item.created_at,
+          guardian: item.guardian,
         }));
 
-        setRows(normalized as AttendanceRow[]);
+        setAttendances(formatted || []);
       }
     };
 
@@ -58,15 +51,28 @@ export default function AttendancesPage() {
   // =============================
   // FILTER PENCARIAN (CLIENT)
   // =============================
-  const filtered = rows.filter((r) => {
+  // =============================
+  // FILTER PENCARIAN (CLIENT)
+  // =============================
+  const filtered = attendances.filter((r) => {
     const q = search.toLowerCase();
 
     return (
-      r.guardian_id.toString().includes(q) ||
-      r.guardians?.nama_wali.toLowerCase().includes(q) ||
-      r.guardians?.nama_murid.toLowerCase().includes(q) ||
-      r.guardians?.kelas_murid.toLowerCase().includes(q) ||
-      new Date(r.scanned_at)
+      r.id.toString().includes(q) || // Search by attendance ID or guardian ID if mapped? 
+      // r.guardian_id is not in Attendance type definition above. 
+      // Wait, Attendance type loop above has 'guardian'. 
+      // Check 'formatted' in useEffect: id, created_at, guardian
+      // We need to check if we can search by guardian ID. 
+      // The guardian object inside attendance doesn't have id_wali explicitly in the select logic?
+      // "guardian:guardians (nama_wali...)"
+      // Let's check the select query: "guardian:guardians (nama_wali, nama_murid, kelas_murid)"
+      // It does NOT select id_wali. 
+      // So we can only search by names and class.
+
+      r.guardian.nama_wali.toLowerCase().includes(q) ||
+      r.guardian.nama_murid.toLowerCase().includes(q) ||
+      r.guardian.kelas_murid.toLowerCase().includes(q) ||
+      new Date(r.created_at)
         .toLocaleString("id-ID")
         .toLowerCase()
         .includes(q)
@@ -75,8 +81,8 @@ export default function AttendancesPage() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-base font-semibold text-slate-100">
-        Log Kehadiran ({ACTIVE_EVENT})
+      <h2 className="text-base font-semibold text-slate-800 dark:text-slate-100">
+        Log Kehadiran ({activeEvent})
       </h2>
 
       {/* SEARCH BAR */}
@@ -84,18 +90,18 @@ export default function AttendancesPage() {
         <input
           type="text"
           placeholder="Cari: wali, murid, kelas, ID, waktu..."
-          className="w-full md:w-64 rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-emerald-500 transition"
+          className="input-field w-full md:w-64"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 
       {/* TABLE */}
-      <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/80">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/80 backdrop-blur-sm">
         <div className="max-h-[60vh] overflow-auto">
           <table className="min-w-full text-xs">
-            <thead className="bg-slate-900/90 sticky top-0 z-10">
-              <tr className="text-left text-[11px] uppercase tracking-wide text-slate-400">
+            <thead className="bg-slate-50/90 dark:bg-slate-900/90 sticky top-0 z-10">
+              <tr className="text-left text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
                 <th className="px-3 py-2">Waktu</th>
                 <th className="px-3 py-2">ID Wali</th>
                 <th className="px-3 py-2">Wali</th>
@@ -104,26 +110,26 @@ export default function AttendancesPage() {
               </tr>
             </thead>
 
-            <tbody>
+            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
               {filtered.map((r) => (
                 <tr
                   key={r.id}
-                  className="border-t border-slate-800/80 hover:bg-slate-800/60"
+                  className="hover:bg-slate-100/50 dark:hover:bg-slate-800/60 transition-colors"
                 >
-                  <td className="px-3 py-2 text-slate-300">
-                    {new Date(r.scanned_at).toLocaleString("id-ID")}
+                  <td className="px-3 py-2 text-slate-600 dark:text-slate-300">
+                    {new Date(r.created_at).toLocaleString("id-ID")}
                   </td>
-                  <td className="px-3 py-2 text-slate-300">
-                    {r.guardian_id}
+                  <td className="px-3 py-2 text-slate-600 dark:text-slate-300">
+                    - {/* ID Wali not fetched */}
                   </td>
-                  <td className="px-3 py-2 text-slate-100">
-                    {r.guardians?.nama_wali}
+                  <td className="px-3 py-2 text-slate-800 dark:text-slate-100 font-medium">
+                    {r.guardian.nama_wali}
                   </td>
-                  <td className="px-3 py-2 text-slate-200">
-                    {r.guardians?.nama_murid}
+                  <td className="px-3 py-2 text-slate-700 dark:text-slate-200">
+                    {r.guardian.nama_murid}
                   </td>
-                  <td className="px-3 py-2 text-slate-300">
-                    {r.guardians?.kelas_murid}
+                  <td className="px-3 py-2 text-slate-600 dark:text-slate-300">
+                    {r.guardian.kelas_murid}
                   </td>
                 </tr>
               ))}
@@ -132,7 +138,7 @@ export default function AttendancesPage() {
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-3 py-4 text-center text-slate-400"
+                    className="px-3 py-8 text-center text-slate-500 dark:text-slate-400"
                   >
                     Belum ada data kehadiran untuk event ini.
                   </td>

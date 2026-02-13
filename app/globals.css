@@ -4,40 +4,48 @@
 
 @layer utilities {
   .glass {
-    @apply bg-slate-900/40 backdrop-blur-xl border border-slate-800/50;
+    @apply bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50;
   }
+
   .glass-card {
-    @apply bg-slate-900/60 backdrop-blur-lg border border-slate-800/60 shadow-xl shadow-black/20;
+    @apply bg-white/80 dark:bg-slate-900/60 backdrop-blur-lg border border-slate-200/60 dark:border-slate-800/60 shadow-xl shadow-slate-200/50 dark:shadow-black/20;
   }
+
   .input-field {
-    @apply bg-slate-900/50 border border-slate-700/50 rounded-xl px-4 py-2.5 text-sm text-slate-200 outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 transition-all placeholder:text-slate-500;
+    @apply bg-slate-50 dark:bg-slate-900/50 border border-slate-300/50 dark:border-slate-700/50 rounded-xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500;
   }
 }
 
 body {
-    @apply bg-slate-950 text-slate-50 overflow-x-hidden;
-    background-image: 
-        radial-gradient(circle at 15% 50%, rgba(16, 185, 129, 0.08), transparent 25%), 
-        radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.08), transparent 25%);
-    background-attachment: fixed;
+  @apply bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 overflow-x-hidden transition-colors duration-300;
+  background-image:
+    radial-gradient(circle at 15% 50%, rgba(16, 185, 129, 0.05), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.05), transparent 25%);
+  background-attachment: fixed;
+}
+
+.dark body {
+  background-image:
+    radial-gradient(circle at 15% 50%, rgba(16, 185, 129, 0.1), transparent 30%),
+    radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.1), transparent 30%);
 }
 
 /* Scrollbar halus */
 ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-    background: transparent;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.2);
-    border-radius: 999px;
-    transition: background 0.2s;
+  background: rgba(148, 163, 184, 0.2);
+  border-radius: 999px;
+  transition: background 0.2s;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(16, 185, 129, 0.5);
+  background: rgba(16, 185, 129, 0.5);
 }

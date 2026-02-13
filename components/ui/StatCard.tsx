@@ -11,15 +11,15 @@ type StatCardProps = {
 
 export function StatCard({ label, value, description, icon }: StatCardProps) {
   return (
-    <div className="group relative overflow-hidden rounded-2xl bg-slate-900/40 backdrop-blur-md border border-white/5 p-6 shadow-lg shadow-black/20 hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-500/10 hover:border-emerald-500/20 transition-all duration-300">
-      <div className="absolute top-0 right-0 p-4 opacity-50 text-6xl text-white/5 saturate-0 group-hover:text-emerald-500/10 transition-colors pointer-events-none select-none">
+    <div className="group relative overflow-hidden rounded-2xl bg-white/60 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200 dark:border-white/5 p-6 shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:-translate-y-1 hover:shadow-xl dark:hover:shadow-2xl hover:shadow-emerald-500/10 hover:border-emerald-500/20 transition-all duration-300">
+      <div className="absolute top-0 right-0 p-4 opacity-50 text-6xl text-slate-900/5 dark:text-white/5 saturate-0 group-hover:text-emerald-500/10 transition-colors pointer-events-none select-none">
         {icon}
       </div>
 
       <div className="relative flex justify-between items-start z-10">
         <div>
-          <p className="text-[11px] uppercase tracking-widest text-slate-400 font-bold">{label}</p>
-          <p className="mt-2 text-3xl font-bold text-slate-100 tracking-tight">{value}</p>
+          <p className="text-[11px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold">{label}</p>
+          <p className="mt-2 text-3xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">{value}</p>
         </div>
 
         {icon && (

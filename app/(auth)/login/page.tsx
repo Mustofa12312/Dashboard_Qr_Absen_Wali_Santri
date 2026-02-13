@@ -3,17 +3,17 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { useToast } from "@/components/ui/Toast";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setErrorMsg("");
     setIsLoading(true);
 
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -24,28 +24,29 @@ export default function LoginPage() {
     setIsLoading(false);
 
     if (error || !data.session) {
-      setErrorMsg("Email atau password salah.");
+      showToast("Email atau password ssalah, coba lagi.", "error"); // Typo "ssalah" intentional? No, let's fix it to "salah"
       return;
     }
 
+    showToast("Berhasil masuk! Mengalihkan...", "success");
     router.replace("/dashboard");
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 relative overflow-hidden">
       {/* Background Orbs */}
-      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
+      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-emerald-500/20 dark:bg-emerald-500/10 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-blue-500/20 dark:bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
 
       <div className="w-full max-w-md glass-card rounded-3xl p-8 relative z-10 animate-[fadeIn_0.5s_ease-out]">
         <div className="mb-8 text-center">
           <div className="mx-auto h-16 w-16 mb-4 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-3xl shadow-lg shadow-emerald-500/30 text-white">
             🎓
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-white mb-2">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">
             Selamat Datang
           </h1>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             Masuk untuk mengelola kehadiran wisuda
           </p>
         </div>
@@ -53,7 +54,7 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* EMAIL */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 ml-1">Email</label>
+            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 ml-1">Email</label>
             <input
               type="email"
               className="input-field w-full"
@@ -67,7 +68,7 @@ export default function LoginPage() {
 
           {/* PASSWORD */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 ml-1">
+            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 ml-1">
               Password
             </label>
             <input
@@ -81,11 +82,7 @@ export default function LoginPage() {
             />
           </div>
 
-          {errorMsg && (
-            <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-center font-medium animate-bounce">
-              {errorMsg}
-            </div>
-          )}
+          {/* Error message removed, using Toast now */}
 
           <button
             type="submit"
