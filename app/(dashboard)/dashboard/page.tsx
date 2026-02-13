@@ -97,18 +97,21 @@ export default function DashboardPage() {
           label="Total Wali"
           value={totalGuardians}
           description="Jumlah wali terdaftar"
+          icon="👥"
         />
 
         <StatCard
           label="Sudah Hadir"
           value={hadirCount}
           description={`Event ${ACTIVE_EVENT}`}
+          icon="✅"
         />
 
         <StatCard
           label="Persentase Kehadiran"
           value={`${percent}%`}
           description="Dari total wali"
+          icon="📈"
         />
       </div>
 

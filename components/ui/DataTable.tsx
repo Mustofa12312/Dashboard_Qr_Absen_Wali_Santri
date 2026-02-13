@@ -2,25 +2,25 @@
 import React from "react";
 import clsx from "clsx";
 
-type Column = {
-  key: string;
+type Column<T> = {
+  key: keyof T;
   label: string;
   className?: string;
 };
 
-type DataTableProps = {
-  columns: Column[];
-  data: any[];
-  keyField?: string;
+type DataTableProps<T> = {
+  columns: Column<T>[];
+  data: T[];
+  keyField?: keyof T;
   emptyText?: string;
 };
 
-export function DataTable({
+export function DataTable<T extends Record<string, any>>({
   columns,
   data,
   keyField = "id",
   emptyText = "Tidak ada data",
-}: DataTableProps) {
+}: DataTableProps<T>) {
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/80 shadow-lg shadow-black/30">
       <div className="max-h-[65vh] overflow-auto">
@@ -29,7 +29,7 @@ export function DataTable({
             <tr className="text-slate-400 uppercase text-[11px] tracking-wider">
               {columns.map((col) => (
                 <th
-                  key={col.key}
+                  key={String(col.key)}
                   className={clsx("px-3 py-2 text-left", col.className)}
                 >
                   {col.label}
@@ -52,12 +52,12 @@ export function DataTable({
 
             {data.map((row) => (
               <tr
-                key={row[keyField]}
+                key={String(row[keyField])}
                 className="border-t border-slate-800/70 hover:bg-slate-800/60 transition-colors"
               >
                 {columns.map((col) => (
                   <td
-                    key={col.key}
+                    key={String(col.key)}
                     className={clsx("px-3 py-2 text-slate-200", col.className)}
                   >
                     {String(row[col.key] ?? "-")}

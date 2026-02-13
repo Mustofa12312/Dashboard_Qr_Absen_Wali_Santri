@@ -1,9 +1,6 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
 
@@ -12,31 +9,6 @@ export default function DashboardLayout({
 }: {
   children: ReactNode;
 }) {
-  const router = useRouter();
-  const [checking, setChecking] = useState(true);
-
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data } = await supabase.auth.getSession();
-
-      if (!data.session) {
-        router.replace("/login");
-      } else {
-        setChecking(false);
-      }
-    };
-
-    checkSession();
-  }, [router]);
-
-  if (checking) {
-    return (
-      <div className="flex h-screen items-center justify-center text-slate-300">
-        Memeriksa sesi...
-      </div>
-    );
-  }
-
   return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar />

@@ -32,24 +32,32 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-md rounded-3xl bg-slate-900/80 border border-slate-700/70 shadow-2xl shadow-emerald-500/10 p-8">
-        <div className="mb-6 text-center">
-          <h1 className="text-2xl font-bold tracking-tight">
-            Absen Wisuda Admin
+    <div className="flex min-h-screen items-center justify-center px-4 relative overflow-hidden">
+      {/* Background Orbs */}
+      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
+
+      <div className="w-full max-w-md glass-card rounded-3xl p-8 relative z-10 animate-[fadeIn_0.5s_ease-out]">
+        <div className="mb-8 text-center">
+          <div className="mx-auto h-16 w-16 mb-4 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-3xl shadow-lg shadow-emerald-500/30 text-white">
+            🎓
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-white mb-2">
+            Selamat Datang
           </h1>
-          <p className="mt-1 text-sm text-slate-400">
-            Masuk untuk mengelola kehadiran wali.
+          <p className="text-sm text-slate-400">
+            Masuk untuk mengelola kehadiran wisuda
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           {/* EMAIL */}
-          <div>
-            <label className="text-sm font-medium text-slate-200">Email</label>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 ml-1">Email</label>
             <input
               type="email"
-              className="mt-1 w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-400"
+              className="input-field w-full"
+              placeholder="admin@sekolah.sch.id"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -58,13 +66,14 @@ export default function LoginPage() {
           </div>
 
           {/* PASSWORD */}
-          <div>
-            <label className="text-sm font-medium text-slate-200">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 ml-1">
               Password
             </label>
             <input
               type="password"
-              className="mt-1 w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-400"
+              className="input-field w-full"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -72,14 +81,18 @@ export default function LoginPage() {
             />
           </div>
 
-          {errorMsg && <p className="text-xs text-red-400">{errorMsg}</p>}
+          {errorMsg && (
+            <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-center font-medium animate-bounce">
+              {errorMsg}
+            </div>
+          )}
 
           <button
             type="submit"
             disabled={isLoading}
-            className="mt-2 w-full rounded-xl bg-emerald-500 hover:bg-emerald-400 transition-colors py-2.5 text-sm font-semibold text-slate-900 disabled:opacity-60"
+            className="mt-4 w-full rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? "Masuk..." : "Masuk"}
+            {isLoading ? "Sedang Masuk..." : "Masuk ke Dashboard"}
           </button>
         </form>
       </div>
